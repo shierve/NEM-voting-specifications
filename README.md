@@ -80,7 +80,7 @@ where:
 
 2. description:
 
-This message contains only the description of the poll, which we want to be as long as possible:
+This message contains only the description of the poll, which we want to be able to be as long as possible:
 
 `description:this is the description`
 
@@ -102,7 +102,36 @@ The whitelist message contains a whitelist with people who is allowed to vote. T
 
 the message contains an array with the whitelisted addresses.
 
-
-
-
 ## Vote counting
+
+The result of a poll is not stored anywhere, since that would mean you have to trust the server storing it to have calculated the results correctly. To guarantee decentralization the results can be calculated by anybody anytime. The client asks the NIS for the poll information and for all of the transactions sent to the option accounts. If everybody uses the same protocol for counting votes then they get the same result.
+
+We will describe now the description for the correct protocol implemented in NanoWallet, that should be used by everybody in order to get the correct results. Example code will also be provided in this repo.
+
+1. Get the poll information
+
+First query the api for the first messages on the poll account that start with "options:" and "formData:". It is important that the first ones are used, since anybody can send a new message to the poll account. From the options message we get all the option account's addresses. From the formData message we get important information like the poll ending, whether it is multiple option, and the type of poll. From the options message we get all the option addresses.
+
+2. Get all the votes and apply filter
+
+Now that we have all the option addresses we ask the API for all the transactions sent to them and store them separately, so that we have all the transactions sent to each option account.
+
+If the date of ending of the poll is in the future we are performing a provisional vote counting. The results can be unreliable since the importances of accounts change overtime, so the final result can vary a lot from the provisional results. In the other hand if the date of ending is in the past then we will be performing a definitive count. The importances that will be taken are those that accounts had at the last harvested block before the poll end.
+
+In the case of a finished poll we must first find the last harvested block before the doe, this can be done with the API indirectly by approximation and then searching for the exact block. We will call this block LB (for last block)
+
+Once we have found LB we filter out all those transactions that were included in a block > LB. It is important that we do this filter by the included block and not by the transaction timestamp, since it can be modified manually, and we don't want anything that happens after LB to affect the results of the poll.
+
+Then we apply a second filter, where we ignore all the transactions that send xem or mosaics, and we remain only with 0xem / 0 mosaics transactions. This is to avoid people from voting from an exchange, as explained in detail below. This filter is applied to both ended and not ended polls.
+
+Now we don't need the transaction info anymore, we just need the sender addresses, so we transform each transction to it's sender address for easier manipulation.
+
+3. Handle duplicated votes
+
+In the standard protocol we allow for a user to vote more than once on the same option, but the vote will only count once. When there are votes from the same account to different options, then it depends on the type of poll. For single option polls all the votes from the user are nullified for that poll. In the case of multiple option polls the importance of the voter is divided between the number of options the account voted on. So an account that has 4% importance and votes on two options will add 2% to both of the options, and so on.
+
+To do this first we take each array of addresses, representing the votes for each option and we sort them so that if there are repeated addresses they will be adjacent. Then we iterate for the whole array and delete repetitions, leaving just one of each account.
+
+To nullify multiple votes on single option polls we merge all the option arrays into a single array, such that the resulting array contains all voter addresses for all the accounts and they remain sorted. Since the addresses are unique for each option after the previous filter, we can conclude that if there is a repetition in the total array then that address voted in two different options, and all of its votes are nullified.
+
+

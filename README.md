@@ -110,7 +110,7 @@ Voting from a multisig account is also a transaction with 0xem and 0 mosaics, bu
 
 `vote for poll TBR6KPJ2PMUXVWIDLYAUAY52XBU7KDOVTWYLBTUN with option "yes"`
 
-but the format is not important, since the message is just informative for cosigners, and is ignored by the system.
+but the format is not important, since the message is just informative for cosigners, and is ignored by the system. Nothing stops a multisig cosigner from creating a manual vote with a misleading message, but when you have a multisig account with somebody a certain amount of trust is expected.
 
 ## Vote counting
 

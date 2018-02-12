@@ -30,7 +30,7 @@ The final poll structure would look something like this:
 
 Where black arrows represent address pointers and colored arrows represent vote messages.
 
-## Poll Generation
+## Poll Creation
 
 We are going to generate some accounts to create a poll. This accounts should not be owned by anybody, they are just used to store information, so when we crete a new account, we don't need to save the private key for it, it will just be discarded.
 
@@ -102,17 +102,27 @@ The whitelist message contains a whitelist with people who is allowed to vote. T
 
 the message contains an array with the whitelisted addresses.
 
+## Voting
+
+A vote from a simple account consists of a transaction with 0xem and 0 mosaics to the desired option account. It is important that there is no xem or mosaics included, or it will not be counted. A message can be added, but it is not added when voting from NanoWallet.
+
+Voting from a multisig account is also a transaction with 0xem and 0 mosaics, but it includes a message by default, which tells cosigners what poll and option this transaction is for. The message in NanoWallet looks like this:
+
+`vote for poll TBR6KPJ2PMUXVWIDLYAUAY52XBU7KDOVTWYLBTUN with option "yes"`
+
+but the format is not important, since the message is just informative for cosigners, and is ignored by the system.
+
 ## Vote counting
 
 The result of a poll is not stored anywhere, since that would mean you have to trust the server storing it to have calculated the results correctly. To guarantee decentralization the results can be calculated by anybody anytime. The client asks the NIS for the poll information and for all of the transactions sent to the option accounts. If everybody uses the same protocol for counting votes then they get the same result.
 
 We will describe now the description for the correct protocol implemented in NanoWallet, that should be used by everybody in order to get the correct results. Example code will also be provided in this repo.
 
-1. Get the poll information
+1. **Get the poll information**
 
 First query the api for the first messages on the poll account that start with "options:" and "formData:". It is important that the first ones are used, since anybody can send a new message to the poll account. From the options message we get all the option account's addresses. From the formData message we get important information like the poll ending, whether it is multiple option, and the type of poll. From the options message we get all the option addresses.
 
-2. Get all the votes and apply filter
+2. **Get all the votes and apply filter**
 
 Now that we have all the option addresses we ask the API for all the transactions sent to them and store them separately, so that we have all the transactions sent to each option account.
 
@@ -126,7 +136,9 @@ Then we apply a second filter, where we ignore all the transactions that send xe
 
 Now we don't need the transaction info anymore, we just need the sender addresses, so we transform each transction to it's sender address for easier manipulation.
 
-3. Handle duplicated votes
+For whitelist polls an additional filter is applied that accepts only votes sent by accounts in the whitelist.
+
+3. **Handle duplicated votes**
 
 In the standard protocol we allow for a user to vote more than once on the same option, but the vote will only count once. When there are votes from the same account to different options, then it depends on the type of poll. For single option polls all the votes from the user are nullified for that poll. In the case of multiple option polls the importance of the voter is divided between the number of options the account voted on. So an account that has 4% importance and votes on two options will add 2% to both of the options, and so on.
 
@@ -134,4 +146,38 @@ To do this first we take each array of addresses, representing the votes for eac
 
 To nullify multiple votes on single option polls we merge all the option arrays into a single array, such that the resulting array contains all voter addresses for all the accounts and they remain sorted. Since the addresses are unique for each option after the previous filter, we can conclude that if there is a repetition in the total array then that address voted in two different options, and all of its votes are nullified.
 
+4. **Final results**
 
+For a whitelist poll the results are just the number of addresses on each option, since after the filters only valid votes are left. Fot importance polls it is a little more complicated:
+
+First we get a list of all the accounts that have valid votes, and then we ask the api for all of their importances at block LB, or in current block if the poll has not ended.
+
+If it is a multiple answer poll, we divide the importance score of each account by the number of votes from that account.
+
+Then finally we sum the importances of all the addresses on every option, and that gives us the result. The result is given in fractions of 1, so we multiply it by 100 to get the % score.
+
+## Attacks
+
+In this section we will describe a list of known possible attacks and the solution the system has for it, where possible.
+
+### Double voting
+
+Double voting is the act of voting twice with the same account, or transfering importance to another account and voting again.
+
+Voting on different options with the same account won't work since the vote counting protocol will invalidate such attempts.
+
+Transfering importance to another account to vote more than once won't work either, since the final result of a poll is calculated from the importances in a single block at the poll ending, not at the time of the vote.
+
+### Voting from an exchange
+
+Cryptocurrency exchanges have some of the accounts with the most importance on the network. If an exchange user makes a withdrawal from an exchange and introduces an option account as their address, the huge exchange wallet will send a transaction to an option account.
+
+Initially the voting module in NanoWallet had a list of exchange addresses that were blacklisted from voting on any poll, nut the list is hard to mantain and can be unreliable.
+
+Latest versions implement a smarter system that filters out any transaction that transfers xem or mosaics. Since all exchanges have a minimum amount for withdrawal, you cannot withdraw 0 xem and thus you can not create a valid vote from the exchange's address.
+
+## Scalability
+
+## Old poll structure
+
+## Future

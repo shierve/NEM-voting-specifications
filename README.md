@@ -150,7 +150,7 @@ To nullify multiple votes on single option polls we merge all the option arrays 
 
 For a whitelist poll the results are just the number of addresses on each option, since after the filters only valid votes are left. Fot importance polls it is a little more complicated:
 
-First we get a list of all the accounts that have valid votes, and then we ask the api for all of their importances at block LB, or in current block if the poll has not ended.
+First we get a list of all the accounts that have valid votes, and then we ask the api for all of their importances at block LB, or in current block if the poll has not ended. Requesting all the importances at the same time for a big enough poll will trigger the spam protection in the NIS, check the scalability section for a better solution. Also, not all nodes support historical data. On the mainnet http://hugealice.nem.ninja is the only one that does as far as I know, so it should be used for historical data requests.
 
 If it is a multiple answer poll, we divide the importance score of each account by the number of votes from that account.
 
@@ -178,6 +178,104 @@ Latest versions implement a smarter system that filters out any transaction that
 
 ## Scalability
 
+### Poll index scalability
+
+As the number of polls increases the time taken to load all the poll headers from the poll index increases. In the future if the poll index gets too big to be loaded in a reasonable time some decision will have to be made. For example changing the default poll index to a new one or limiting the maximum amount of polls loaded.
+
+### Importance score requests
+
+For counting poll results we need to request from the NIS server the importance scores of all the voters at a certain block. There is an API call that will give you this information for one account. But the problem is that when the number of votes increases, the number of requests gets too high. The NIS has a spam protection that triggers when an ip exceeds 25 requests per second. When the NanoWallet implementation first rolled out in the mainnet, and big polls started to take place, we ran into this problem, and the NEM developers offered as a solution a new API call. It is a single POST request that gets an array of addresses and returns an array of importances, in just one request.
+
+The POST request has the form:
+
+http://alice.dd-dns.de:7890/account/historical/get/batch
+
+with supplied json object:
+```javascript
+{
+   "accounts": [
+      { "account": "TALICEROONSJCPHC63F52V6FY3SDMSVAEUGHMB7C" },
+      { "account": "TALIC37D2B7KRFHGXRJAQO67YWOUWWA36OU46HSG" }
+   ],
+   "startHeight": 100000,
+   "endHeight": 100001,
+   "incrementBy": 1
+}
+```
+It can actually return the importance for different blocks, between startHeight and endHeight, in increments of incrementBy, but for voting that is not needed so startHeight and endHeight will be the same.
+
+The given parameters would return an object like:
+```javascript
+{
+
+    "data": [
+        {
+            "data": [
+                {
+                    "pageRank": 0.0035903320547790232,
+                    "address": "TALICEROONSJCPHC63F52V6FY3SDMSVAEUGHMB7C",
+                    "balance": 50386727995377,
+                    "importance": 0.0059685675660915375,
+                    "vestedBalance": 50382877508084,
+                    "unvestedBalance": 3850487293,
+                    "height": 100000
+                },
+                {
+                    "pageRank": 0.0035903320547790232,
+                    "address": "TALICEROONSJCPHC63F52V6FY3SDMSVAEUGHMB7C",
+                    "balance": 50386727995377,
+                    "importance": 0.0059685675660915375,
+                    "vestedBalance": 50382877508084,
+                    "unvestedBalance": 3850487293,
+                    "height": 100001
+                }
+            ]
+        },
+        {
+            "data": [
+                {
+                    "pageRank": 0.0035903320547790232,
+                    "address": "TALIC37D2B7KRFHGXRJAQO67YWOUWWA36OU46HSG",
+                    "balance": 50203823850265,
+                    "importance": 0.005948444666726026,
+                    "vestedBalance": 50200067389240,
+                    "unvestedBalance": 3756461025,
+                    "height": 100000
+                },
+                {
+                    "pageRank": 0.0035903320547790232,
+                    "address": "TALIC37D2B7KRFHGXRJAQO67YWOUWWA36OU46HSG",
+                    "balance": 50203823850265,
+                    "importance": 0.005948444666726026,
+                    "vestedBalance": 50200067389240,
+                    "unvestedBalance": 3756461025,
+                    "height": 100001
+                }
+            ]
+        }
+    ]
+
+}
+```
+
 ## Old poll structure
 
+In the first version of the voting system the structure of the options message that stores the options and their respective addresses was different. It looked like this:
+
+`options:{"strings":["yes","no"],"addresses":["TC2BOQO2JVBZMVSFTUILCSQBGOUAZIOCZXTHAP6S","TCKMEQVM32F7BL6IHU2QF4S6JJVXIMDFXN6PXBN6"]}`
+
+Where the first string of the strings array was supposed to correspond to the first address of the addresses array, and it worked for a while, until for some reason the addresses got swapped between different versions of NanoWallet and people sent votes to an option he didn't intend to. The structure was changed to be clearer and give no margin for error, by linking the strings directly to their addresses with a map:
+
+`options:{"strings":["yes","no"],"link":{"yes":"TC2BOQO2JVBZMVSFTUILCSQBGOUAZIOCZXTHAP6S","no":"TCKMEQVM32F7BL6IHU2QF4S6JJVXIMDFXN6PXBN6"}}`
+
+Current versions of NanoWallet still have compatibility for old structure polls, but due to the unreliability, it is strongly advised to avoid it at all costs and create polls always with the new structure. To make sure polls are created correctly it is important to always use the latest version of NanoWallet to create polls.
+
 ## Future
+
+Right now the most important feature that is lacking is the ability to create mosaic polls. Mosaic polls would be weighted by the amount of a certain mosaic that the voter owns. This would allow for very interesting possibilities, and a better way of creating whitelist polls. It would work essentially as Proof of Stake, and since xem is a mosaic itself you could use it as the weighing token.
+
+Right now this could only be implemented with xem, since it is the only mosaic with historical data available in the NIS.
+
+Historical data is the basis of the voting system. It is what allows the system to be trully decentralized and trust-less, since it allows everybody to verify the results themselves. This is what makes the voting system meaningful.
+
+Mosaic polls could be created and votes could be counted for the current block, but not for a past one, so a result should be stored somewhere and people who weren't there would have to trust the results. This is not the blockchain way, so it stays unimplemented until this function becomes available in the NIS. Maybe in Catapult, who knows...

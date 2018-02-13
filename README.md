@@ -14,11 +14,11 @@
 
 The NEM voting system allows anybody to create a poll on the NEM blockchain for other people to vote on. Poll creation and voting is implemented on NanoWallet, and results can be seen both in NanoWallet and some NEM block explorers.
 
-The system leverages the already existing importance score from every account to weigh votes casted.
+The system leverages the already existing importance score from every account to weigh votes.
 
-There is also the possibility of creating a poll with a whitelist where all votes casted weigh equally, and in the future if the NIS allows for it, a mosaic vote is going to be implemented where votes count proportional to the amount of a certain mosaic held by the voter.
+There is also the possibility of creating a poll with a whitelist where all casted votes weigh equally, and in the future if the NIS allows for it, a mosaic vote is going to be implemented where votes count proportional to the amount of a certain mosaic held by the voter.
 
-In this document we describe the inner workings of the system.
+In this document we describe the inner workings and technical details of the system.
 
 ## General structure <a name="structure"></a>
 

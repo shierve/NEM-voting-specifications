@@ -73,7 +73,7 @@ The messages in a NEM transaction have a length limit, which limits the details 
 
 Three messages are sent to the Poll Account for a regular poll:
 
-1. formData:
+1. **formData:**
 
 This message contains the data that defines the poll parameters. An example message is:
 
@@ -88,13 +88,13 @@ where:
     - 1 -> whitelist
     - 2 -> mosaic (not implemented)
 
-2. description:
+2. **description:**
 
 This message contains only the description of the poll, which we want to be able to be as long as possible:
 
 `description:this is the description`
 
-3. options:
+3. **options:**
 
 This message contains the poll's options and their respective option account addresses. It consists of an array of the option strings and a dictionary that maps the option strings to their respective option account.
 
@@ -104,7 +104,7 @@ The string array is redundant and could be removed to save space but it was left
 
 the strings parameter contains an array of the option strings. The link parameter is a map from strings to their respective option addresses.
 
-4. whitelist (only for whitelist polls):
+4. **whitelist (only for whitelist polls):**
 
 The whitelist message contains a whitelist with people who is allowed to vote. This is very limited by the message length and right now does not have very practical uses. The better option would be to distribute a mosaic for everyone you want to be allowed to vote and then create a mosaic poll. But as of the current NIS api there is no historical information on mosaics, so the mosaic vote counting can't be properly implemented in a decentralized way.
 

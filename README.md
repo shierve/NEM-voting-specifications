@@ -4,7 +4,11 @@
 
 1. [Introduction](#introduction)
 2. [General Structure](#structure)
-3. [Poll Creation](#creation)
+3. [Voting](#voting)
+4. [Counting Votes](#counting)
+5. [Scalability](#scalability)
+6. [Old Poll Structure](#old)
+7. [Future](#future)
 
 ## Introduction <a name="introduction"></a>
 
@@ -108,7 +112,7 @@ The whitelist message contains a whitelist with people who is allowed to vote. T
 
 the message contains an array with the whitelisted addresses.
 
-## Voting
+## Voting <a name="voting"></a>
 
 A vote from a simple account consists of a transaction with 0xem and 0 mosaics to the desired option account. It is important that there is no xem or mosaics included, or it will not be counted. A message can be added, but it is not added when voting from NanoWallet.
 
@@ -118,7 +122,7 @@ Voting from a multisig account is also a transaction with 0xem and 0 mosaics, bu
 
 but the format is not important, since the message is just informative for cosigners, and is ignored by the system. Nothing stops a multisig cosigner from creating a manual vote with a misleading message, but when you have a multisig account with somebody a certain amount of trust is expected.
 
-## Vote counting
+## Vote counting <a name="counting"></a>
 
 The result of a poll is not stored anywhere, since that would mean you have to trust the server storing it to have calculated the results correctly. To guarantee decentralization the results can be calculated by anybody anytime. The client asks the NIS for the poll information and for all of the transactions sent to the option accounts. If everybody uses the same protocol for counting votes then they get the same result.
 
@@ -162,7 +166,7 @@ If it is a multiple answer poll, we divide the importance score of each account 
 
 Then finally we sum the importances of all the addresses on every option, and that gives us the result. The result is given in fractions of 1, so we multiply it by 100 to get the % score.
 
-## Attacks
+## Attacks <a name="attacks"></a>
 
 In this section we will describe a list of known possible attacks and the solution the system has for it, where possible.
 
@@ -182,7 +186,7 @@ Initially the voting module in NanoWallet had a list of exchange addresses that 
 
 Latest versions implement a smarter system that filters out any transaction that transfers xem or mosaics. Since all exchanges have a minimum amount for withdrawal, you cannot withdraw 0 xem and thus you can not create a valid vote from the exchange's address.
 
-## Scalability
+## Scalability <a name="scalability"></a>
 
 ### Poll index scalability
 
@@ -264,7 +268,7 @@ The given parameters would return an object like:
 }
 ```
 
-## Old poll structure
+## Old poll structure <a name="old"></a>
 
 In the first version of the voting system the structure of the options message that stores the options and their respective addresses was different. It looked like this:
 
@@ -276,7 +280,7 @@ Where the first string of the strings array was supposed to correspond to the fi
 
 Current versions of NanoWallet still have compatibility for old structure polls, but due to the unreliability, it is strongly advised to avoid it at all costs and create polls always with the new structure. To make sure polls are created correctly it is important to always use the latest version of NanoWallet to create polls.
 
-## Future
+## Future <a name="future"></a>
 
 Right now the most important feature that is lacking is the ability to create mosaic polls. Mosaic polls would be weighted by the amount of a certain mosaic that the voter owns. This would allow for very interesting possibilities, and a better way of creating whitelist polls. It would work essentially as Proof of Stake, and since xem is a mosaic itself you could use it as the weighing token.
 

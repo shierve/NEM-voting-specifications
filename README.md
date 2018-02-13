@@ -112,6 +112,16 @@ The whitelist message contains a whitelist with people who is allowed to vote. T
 
 the message contains an array with the whitelisted addresses.
 
+5. **Poll Header:**
+
+Once the poll has been created and there have been no errors we can add it to a poll index for discoverability. For this purpose we create a poll header with basic data for the poll and send it to a poll index account.
+
+The message looks like this:
+
+`poll:{"title":"title","type":0,"doe":1607772120000,"address":"TBR6KPJ2PMUXVWIDLYAUAY52XBU7KDOVTWYLBTUN"}`
+
+all of the data here is redundant and is already stored in the poll account, but it is replicated here for easy loading of basic information without having to query the poll account.
+
 ## Voting <a name="voting"></a>
 
 A vote from a simple account consists of a transaction with 0xem and 0 mosaics to the desired option account. It is important that there is no xem or mosaics included, or it will not be counted. A message can be added, but it is not added when voting from NanoWallet.

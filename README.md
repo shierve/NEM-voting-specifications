@@ -1,4 +1,4 @@
-# NEM Voting technical specification
+# NEM Voting Standard
 
 ## Table of contents
 
@@ -12,13 +12,13 @@
 
 ## Introduction <a name="introduction"></a>
 
-The NEM voting system allows anybody to create a poll on the NEM blockchain for other people to vote on. Poll creation and voting is implemented on NanoWallet, and results can be seen both in NanoWallet and some NEM block explorers.
+The NEM voting standard allows anybody to create a poll on the NEM blockchain for other people to vote on. Poll creation and voting is implemented on NanoWallet, and results can be seen both in NanoWallet and some NEM block explorers.
 
 The system leverages the already existing importance score from every account to weigh votes.
 
 There is also the possibility of creating a poll with a whitelist where all casted votes weigh equally, and in the future if the NIS allows for it, a mosaic vote is going to be implemented where votes count proportional to the amount of a certain mosaic held by the voter.
 
-In this document we describe the inner workings and technical details of the system.
+In this document we describe the the technical details of the standard that everyone should use for creating, voting and counting polls, so that everybody gets the same results.
 
 ## General structure <a name="structure"></a>
 
@@ -38,7 +38,7 @@ The final poll structure would look something like this:
 
 ![poll structure](structure.png)
 
-Where black arrows represent address pointers and colored arrows represent vote messages.
+Where boxes represent accounts, black arrows represent address pointers and colored arrows represent vote messages.
 
 ## Poll Creation <a name="creation"></a>
 
@@ -292,6 +292,8 @@ Current versions of NanoWallet still have compatibility for old structure polls,
 
 ## Future <a name="future"></a>
 
+### Mosaic voting
+
 Right now the most important feature that is lacking is the ability to create mosaic polls. Mosaic polls would be weighted by the amount of a certain mosaic that the voter owns. This would allow for very interesting possibilities, and a better way of creating whitelist polls. It would work essentially as Proof of Stake, and since xem is a mosaic itself you could use it as the weighing token.
 
 Right now this could only be implemented with xem, since it is the only mosaic with historical data available in the NIS.
@@ -299,3 +301,11 @@ Right now this could only be implemented with xem, since it is the only mosaic w
 Historical data is the basis of the voting system. It is what allows the system to be trully decentralized and trust-less, since it allows everybody to verify the results themselves. This is what makes the voting system meaningful.
 
 Mosaic polls could be created and votes could be counted for the current block, but not for a past one, so a result should be stored somewhere and people who weren't there would have to trust the results. This is not the blockchain way, so it stays unimplemented until this function becomes available in the NIS. Maybe in Catapult, who knows...
+
+### Liquid democracy
+
+Liquid democracy is a democratic system where people can delegate their vote to a representative, who is allowed to vote for them.
+
+This is expected to be implemented in the next big update for the voting system.
+
+There are some ideas about how this can be implemented, but no definitive one is decided yet. If somebody has a suggestion or an idea for an easy, efficient and secure way to implement delegation please contact me and we can discuss the idea.

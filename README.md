@@ -1,6 +1,12 @@
 # NEM Voting technical specification
 
-## Introduction
+## Table of contents
+
+1. [Introduction](#introduction)
+2. [General Structure](#structure)
+3. [Poll Creation](#creation)
+
+## Introduction <a name="introduction"></a>
 
 The NEM voting system allows anybody to create a poll on the NEM blockchain for other people to vote on. Poll creation and voting is implemented on NanoWallet, and results can be seen both in NanoWallet and some NEM block explorers.
 
@@ -10,7 +16,7 @@ There is also the possibility of creating a poll with a whitelist where all vote
 
 In this document we describe the inner workings of the system.
 
-## General structure
+## General structure <a name="structure"></a>
 
 The voting structure consists of a series of NEM accounts and messages sent to them as a way of storing immutable information on the blockchain.
 
@@ -30,7 +36,7 @@ The final poll structure would look something like this:
 
 Where black arrows represent address pointers and colored arrows represent vote messages.
 
-## Poll Creation
+## Poll Creation <a name="creation"></a>
 
 We are going to generate some accounts to create a poll. This accounts should not be owned by anybody, they are just used to store information, so when we crete a new account, we don't need to save the private key for it, it will just be discarded.
 

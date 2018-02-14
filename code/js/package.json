@@ -1,0 +1,16 @@
+{
+  "name": "voting",
+  "version": "1.0.0",
+  "description": "voting standard js implementation",
+  "main": "vote.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "shierve",
+  "license": "ISC",
+  "dependencies": {
+    "crypto-js": "^3.1.9-1",
+    "request": "^2.83.0",
+    "request-promise": "^4.2.2"
+  }
+}

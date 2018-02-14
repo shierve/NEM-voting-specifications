@@ -122,6 +122,8 @@ The message looks like this:
 
 all of the data here is redundant and is already stored in the poll account, but it is replicated here for easy loading of basic information without having to query the poll account.
 
+Now the poll is formed and ready for voting after all the transactions have been confirmed.
+
 ## Voting <a name="voting"></a>
 
 A vote from a simple account consists of a transaction with 0xem and 0 mosaics to the desired option account. It is important that there is no xem or mosaics included, or it will not be counted. A message can be added, but it is not added when voting from NanoWallet.
@@ -144,7 +146,7 @@ First query the api for the first messages on the poll account that start with "
 
 2. **Get all the votes and apply filter**
 
-Now that we have all the option addresses we ask the API for all the transactions sent to them and store them separately, so that we have all the transactions sent to each option account.
+Now that we have all the option addresses we ask the API for all the transactions sent to them and store them separately, so that we have all the transactions sent to each option account, we are only interested on transactions of type 257 (normal transactions) and 4100 (multisig transactions).
 
 If the date of ending of the poll is in the future we are performing a provisional vote counting. The results can be unreliable since the importances of accounts change overtime, so the final result can vary a lot from the provisional results. In the other hand if the date of ending is in the past then we will be performing a definitive count. The importances that will be taken are those that accounts had at the last harvested block before the poll end.
 

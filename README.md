@@ -9,6 +9,7 @@
 5. [Scalability](#scalability)
 6. [Old Poll Structure](#old)
 7. [Future](#future)
+8. [Implementation Example](#code)
 
 ## Introduction <a name="introduction"></a>
 
@@ -311,3 +312,15 @@ Liquid democracy is a democratic system where people can delegate their vote to 
 This is expected to be implemented in the next big update for the voting system.
 
 There are some ideas about how this can be implemented, but no definitive one is decided yet. If somebody has a suggestion or an idea for an easy, efficient and secure way to implement delegation please contact me and we can discuss the idea.
+
+## Implementation Example <a name="code"></a>
+
+You can find in this repo an example implementation in node.js of the vote counting. to execute it navigate to the js folder then:
+
+`$ npm install`
+
+`$ node vote.js NBDK5MNPM7G72GYFN3QXYYKQMFXD4YTYJAGMQXUG`
+
+where NB..UG can be any poll address from the mainnet or testnet.
+
+The program will log to the terminal the details and results of the poll.

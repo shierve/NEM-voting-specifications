@@ -9,7 +9,7 @@
 5. [Scalability](#scalability)
 6. [Old Poll Structure](#old)
 7. [Future](#future)
-8. [Implementation Example](#code)
+8. [Reference Implementation](#code)
 
 ## Introduction <a name="introduction"></a>
 
@@ -315,7 +315,7 @@ There are some ideas about how this can be implemented, but no definitive one is
 
 ## Implementation Example <a name="code"></a>
 
-You can find in this repo an example implementation in node.js of the vote counting. to execute it navigate to the js folder then:
+You can find in this repo a reference implementation in node.js of the vote counting. to execute it navigate to the js folder then:
 
 `$ npm install`
 
@@ -324,3 +324,5 @@ You can find in this repo an example implementation in node.js of the vote count
 where NB..UG can be any poll address from the mainnet or testnet.
 
 The program will log to the terminal the details and results of the poll.
+
+This implementation and its results, along with the standard definition in this document, should be used as reference by anybody implementing vote counting.

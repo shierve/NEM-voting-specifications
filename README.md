@@ -319,7 +319,7 @@ You can find in this repo a reference implementation in node.js of the vote coun
 
 `$ npm install`
 
-`$ node vote.js NBDK5MNPM7G72GYFN3QXYYKQMFXD4YTYJAGMQXUG`
+`$ node count-votes.js NBDK5MNPM7G72GYFN3QXYYKQMFXD4YTYJAGMQXUG`
 
 where NB..UG can be any poll address from the mainnet or testnet.
 

@@ -50,6 +50,7 @@ const getBatchAccountData = (host, addresses) => {
         },
         json: true,
     };
+    console.log(options);
     return rp(options).then((res) => {
         return res.data;
     });

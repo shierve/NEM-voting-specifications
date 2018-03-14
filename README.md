@@ -4,12 +4,13 @@
 
 1. [Introduction](#introduction)
 2. [General Structure](#structure)
-3. [Voting](#voting)
-4. [Counting Votes](#counting)
-5. [Scalability](#scalability)
-6. [Old Poll Structure](#old)
-7. [Future](#future)
-8. [Reference Implementation](#code)
+3. [Poll Creation](#creation)
+4. [Voting](#voting)
+5. [Counting Votes](#counting)
+6. [Scalability](#scalability)
+7. [Old Poll Structure](#old)
+8. [Future](#future)
+9. [Reference Implementation](#code)
 
 ## Introduction <a name="introduction"></a>
 
@@ -65,10 +66,20 @@ Then we send a message to the poll index account to declare it as a poll index a
 where the private field can be "true" or "false".
 
 ### 1. Generate Accounts
-We need to generate one Poll Account and one account for every option, in no particular order, then save all the generated addresses. Address generation can take a little bit of time, this is why you have to wait when creating a poll.
+We need to generate one Poll Account and one account for every option, in no particular order. We don't need the private key because the accounts don't need to be owned by anyone, so we will save some time by generating the public key directly. A public key consists of 32 bytes that can be transformed into an address. We are interested in generating all the accounts from the poll information in a deterministic way, so that we can verify if a certain option account pertains to a certain poll (This will be useful for vote redirection cheating attempts, as discussed later).
+
+The Account generation process will go like this:
+
+Poll Account:
+
+For the poll account we need two strings: the creator public key as an hex string and the poll title. Then we get the public key by doing SHA3-256(publicKey | pollTitle), where | represents string concatenation. This gives us a public key that we can convert easily to an address, as described in the original NEM technical specification.
+
+Option Accounts:
+
+The option accounts will be deterministically derived from the Poll Address in a similar way. Each option will have as public key SHA3-256(pollAddress | optionString) where opionString is the string describing each option. From there we get the addresses.
 
 ### 2. Send Information to Accounts
-Now all the accounts we need have been created, now we need to populate them with information, in the form of messages. We will first send the poll information to the Poll Account.
+Now all the accounts we need have been created, we need to populate them with information, in the form of messages. We will first send the poll information to the Poll Account.
 
 The messages in a NEM transaction have a length limit, which limits the details you can add to a single message, because of this we will split the information in different messages to optimize the quantity of information sent, while minimizing the fee cost of a poll creation.
 

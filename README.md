@@ -136,6 +136,11 @@ all of the data here is redundant and is already stored in the poll account, but
 
 Now the poll is formed and ready for voting after all the transactions have been confirmed.
 
+The default public poll indexes right now are these:
+
+Testnet -> TAVGTNCVGALLUPZC4JTLKR2WX25RQM2QOK5BHBKC
+Mainnet -> NAZN26HYB7C5HVYVJ4SL3KBTDT773NZBAOMGRFZB
+
 ## Voting <a name="voting"></a>
 
 A vote from a simple account consists of a transaction with 0xem and 0 mosaics to the desired option account. It is important that there is no xem or mosaics included, or it will not be counted. A message can be added, but it is not added when voting from NanoWallet.
@@ -148,9 +153,9 @@ but the format is not important, since the message is just informative for cosig
 
 ## Vote counting <a name="counting"></a>
 
-The result of a poll is not stored anywhere, since that would mean you have to trust the server storing it to have calculated the results correctly. To guarantee decentralization the results can be calculated by anybody anytime. The client asks the NIS for the poll information and for all of the transactions sent to the option accounts. If everybody uses the same protocol for counting votes then they get the same result.
+The result of a poll is not stored anywhere, since that would mean you have to trust the server storing it to have calculated the results correctly. To guarantee decentralization the results can be calculated by anybody anytime. The client asks the NIS for the poll information and for all of the transactions sent to the option accounts. If everybody uses the same protocol for counting votes then they get the same results.
 
-We will describe now the description for the correct protocol implemented in NanoWallet, that should be used by everybody in order to get the correct results. Example code will also be provided in this repo.
+We will describe now the specification for the correct protocol implemented in NanoWallet, that should be used by everybody in order to get the correct results. Example code will also be provided in this repo.
 
 1. **Get the poll information**
 
@@ -162,7 +167,7 @@ Now that we have all the option addresses we ask the API for all the transaction
 
 If the date of ending of the poll is in the future we are performing a provisional vote counting. The results can be unreliable since the importances of accounts change overtime, so the final result can vary a lot from the provisional results. In the other hand if the date of ending is in the past then we will be performing a definitive count. The importances that will be taken are those that accounts had at the last harvested block before the poll end.
 
-In the case of a finished poll we must first find the last harvested block before the doe, this can be done with the API indirectly by approximation and then searching for the exact block. We will call this block LB (for last block)
+In the case of a finished poll we must first find the last harvested block before the doe, this can be done with the API indirectly by approximation and then searching for the exact block. We will call this block LB (for last block). Later in this document we will describe a good algorithm to find a block by its timestamp efficiently.
 
 Once we have found LB we filter out all those transactions that were included in a block > LB. It is important that we do this filter by the included block and not by the transaction timestamp, since it can be modified manually, and we don't want anything that happens after LB to affect the results of the poll.
 
@@ -215,6 +220,21 @@ Latest versions implement a smarter system that filters out any transaction that
 ### Poll index scalability
 
 As the number of polls increases the time taken to load all the poll headers from the poll index increases. In the future if the poll index gets too big to be loaded in a reasonable time some decision will have to be made. For example changing the default poll index to a new one or limiting the maximum amount of polls loaded.
+
+### Finding the last valid block for a poll efficiently
+
+The poll information message that is stored in the Poll Account, as described in this document contains a timestamp in milliseconds since the unix epoch. For a finished poll we need to find the last block that was harvested before the end timestamp of the poll. All transactions contain a timestamp, but this timestamp shouldn't be relied upon. It is better to use the block at which they were confirmed. When we want to do this we find a problem: there is no easy way to know which was the last block before a given timestamp. So we will essentially have to request a bunch of blocks to the nis until we find the target. This is temporally costly, so we will try as much as we can to reduce the amount of blocks we request.
+
+To solve this we need to take into account some information:
+1. The target block is such that its timestamp is less or equal than the target timestamp, and the timestamp of the next block is above it.
+2. All the blocks are sorted, so the timestamp of a block will be always higher than that of the previous block
+3. The interval between blocks is not completely random, blocks take an average of 60 seconds to be confirmed.
+
+The most crucial information of all is the fact that we know the blocks are sorted. If they were not sorted this problem would be intractable since the best we could do is to check every single one until we find it.
+
+The first algorithm that comes to mind when searching a sorted list is a binary search. In a binary search you try the middle element, if it is lower than the target then you know the target is not on the left, if it is higher then it is not in the right. We do this until we find the exact block. The maximum amount of blocks that we will have to request to the nis in the worst case is log2(h) + 1 where h is the current height of the blockchain. As of the time of writing this the height is 1546730, so the worst case is we request for 21 blocks. This is ok and will take about 20 seconds. But we can do much better. We are ignoring an important piece of information: the average block time is 60 seconds, so instead of just asking for the middle element each time it is a far better strategy to estimate a block by calculating the block that should be expected to have the target timestamp if the blocks were always exactly 60 seconds. This will not always immediately get the right block because block times fluctuate, but it will get you much closer than blindly guessing the middle one. So we estimate a block and check which side the target must be on, and then reestimate from the current block. If the estimation is beyond a point we know is impossible, then we set it at the first possible block, so the two walls get tighter, just as in the binary search, but with better guessing. With this method we reduce the amount of requested blocks by a lot, averaging about 6 blocks requested each time. This is executed in about 7 seconds which is really good considering the huge search space we are given.
+
+To save another request or two it is also a good idea to save the blocks we already requested, so if we need it again we won't have that additional request. This will save at most 2 seconds or so, but it is something.
 
 ### Importance score requests
 

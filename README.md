@@ -215,6 +215,18 @@ Initially the voting module in NanoWallet had a list of exchange addresses that 
 
 Latest versions implement a smarter system that filters out any transaction that transfers xem or mosaics. Since all exchanges have a minimum amount for withdrawal, you cannot withdraw 0 xem and thus you can not create a valid vote from the exchange's address.
 
+### Vote redirection
+
+Let's imagine Alice creates a poll P1, with two options: "yes" and "no". Alice is very interested that people vote on "yes", and not interested in people voting "no", so alice comes up with an ingenious way of getting people to vote on her poll for the "yes" option without knowing: She creates a second poll P2 that incites people to vote on a single option. For example the poll could be "Is NEM awesome?". Alice can be pretty confident that lots of people are going to vote on "yes" for P2, so when she submits this poll instead of generating the option addresses correctly she changes the "yes" address to be the same as the "yes" address on P1. So now when Bob votes on P2 for the option "yes" he thinks that he is voting for only "P2" but unknowingly he is voting for "P1" too. Three possibilities arise when Bob votes:
+
+1. Bob already voted on P1 with option "yes": Then the vote for P2 will not have an effect on P1 since multiple votes on the same option are only counted as a single vote.
+2. Bob already voted on P1 with option "no": Then the vote for P2 will count as a "yes" vote on P1, so both votes will be invalidated and Bob's "no" vote will not count.
+3. Bob has not voted on P1: Then Bob will unknowingly send a valid "yes" vote for P1.
+
+All three of these scenarios are positive for Alice, they increase the "yes" votes, decrease the valid "no" votes or stay the same for P1. The problem is Bob does not intend to send a vote for P1 when voting for P2 so Alice is cheating.
+
+The solution to this attack is to always validate a poll before voting on it. Validating consists of checking that all the option addresses have been correctly derived from the Poll account as described in the poll creation section. This is secure since to break validation Alice would need to find a collision on SHA-3, which would break much more important things than the NEM voting system, the safety of NEM itself relies on SHA-3, as do many other cryptocurrencies.
+
 ## Scalability <a name="scalability"></a>
 
 ### Poll index scalability

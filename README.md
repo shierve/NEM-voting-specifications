@@ -358,7 +358,7 @@ There are some ideas about how this can be implemented, but no definitive one is
 
 ## Implementation Example <a name="code"></a>
 
-You can find in this repo a reference implementation in node.js of the vote counting. to execute it navigate to the js folder then:
+You can find in this repo a simple implementation in node.js of the vote counting process. to execute it navigate to the js folder then:
 
 `$ npm install`
 
@@ -368,4 +368,4 @@ where NB..UG can be any poll address from the mainnet or testnet.
 
 The program will log to the terminal the details and results of the poll.
 
-This implementation and its results, along with the standard definition in this document, should be used as reference by anybody implementing vote counting.
+The reference implementation of the NEM Voting System is the nem-voting npm module hosted at https://github.com/shierve/nem-voting

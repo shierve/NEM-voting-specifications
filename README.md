@@ -65,9 +65,9 @@ Then we send a message to the poll index account to declare it as a poll index a
 
 where the private field can be "true" or "false". If the index is private only those polls sent by the creator will be valid on the index, we have to send the creator address like this:
 
-`pollIndex:{"private":true,"address":"TATWKUGFW5RABZZGHP3AXMISRHTTCZI643VFMA62"}`
+`pollIndex:{"private":true,"creator":"TATWKUGFW5RABZZGHP3AXMISRHTTCZI643VFMA62"}`
 
-where the parameter address is the address of the index creator.
+where the parameter 'creator' is the address of the index creator.
 
 ### 1. Generate Accounts
 We need to generate one Poll Account and one account for every option, in no particular order. We don't need the private key because the accounts don't need to be owned by anyone, so we will save some time by generating the public key directly. A public key consists of 32 bytes that can be transformed into an address. We are interested in generating all the accounts from the poll information in a deterministic way, so that we can verify if a certain option account pertains to a certain poll (This will be useful for vote redirection cheating attempts, as discussed later).

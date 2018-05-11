@@ -7,10 +7,11 @@
 3. [Poll Creation](#creation)
 4. [Voting](#voting)
 5. [Counting Votes](#counting)
-6. [Scalability](#scalability)
-7. [Old Poll Structure](#old)
-8. [Future](#future)
-9. [Reference Implementation](#code)
+6. [Attacks](#attacks)
+7. [Scalability](#scalability)
+8. [Old Poll Structure](#old)
+9. [Future](#future)
+10. [Reference Implementation](#code)
 
 ## Introduction <a name="introduction"></a>
 
@@ -135,6 +136,8 @@ Once the poll has been created and there have been no errors we can add it to a 
 The message looks like this:
 
 `poll:{"title":"title","type":0,"doe":1607772120000,"address":"TBR6KPJ2PMUXVWIDLYAUAY52XBU7KDOVTWYLBTUN"}`
+
+If the poll has a whitelist the header will also contain the whitelist as a parameter, this makes it easier to filter out those polls where an address can not vote.
 
 all of the data here is redundant and is already stored in the poll account, but it is replicated here for easy loading of basic information without having to query the poll account.
 

@@ -238,7 +238,7 @@ The solution to this attack is to always validate a poll before voting on it. Va
 
 ### Poll index scalability
 
-As the number of polls increases the time taken to load all the poll headers from the poll index increases. In the future if the poll index gets too big to be loaded in a reasonable time some decision will have to be made. For example changing the default poll index to a new one or limiting the maximum amount of polls loaded.
+As the number of polls increases the time taken to load all the poll headers from the poll index increases. In the future if the poll index gets too big to be loaded in a reasonable time some decision will have to be made. For example changing the default poll index to a new one or limiting the maximum amount of polls loaded with pagination.
 
 ### Finding the last valid block for a poll efficiently
 

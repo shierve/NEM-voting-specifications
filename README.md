@@ -129,6 +129,13 @@ The whitelist message contains a whitelist with people who is allowed to vote. T
 
 the message contains an array with the whitelisted addresses.
 
+As of version 2.1.0 the voting module is able to split addresses into multiple messages, so that there is no limitation in the amount of addresses that can be added to a whitelist poll,
+23 addresses fit into a single message. All the messages follow the structure mentioned above.
+Whitelist messages will only be valid if:
+
+    1) they are sent by the account that created the poll.
+    2) they are confirmed before the ending of the poll.
+
 5. **Poll Header:**
 
 Once the poll has been created and there have been no errors we can add it to a poll index for discoverability. For this purpose we create a poll header with basic data for the poll and send it to a poll index account.

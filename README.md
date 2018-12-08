@@ -153,6 +153,7 @@ Now the poll is formed and ready for voting after all the transactions have been
 The default public poll indexes right now are these:
 
 Testnet -> TAVGTNCVGALLUPZC4JTLKR2WX25RQM2QOK5BHBKC
+
 Mainnet -> NAZN26HYB7C5HVYVJ4SL3KBTDT773NZBAOMGRFZB
 
 ## Voting <a name="voting"></a>
